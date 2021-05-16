@@ -26,15 +26,37 @@ const viewTable = (table) => {
     connection.query(`SELECT * FROM ${table}`, (err, res) => {
         if (err) throw err;
         console.table(res);
-        inquirer.prompt(choiceList)
-        .then((answer) => {
-        handleChoice(answer.select);
-        });
-    })
-}
+        mainPrompt(choiceList);
+    });
+};
 
 const addDepartment = () => {
-    
+    inquirer.prompt([
+        {
+            name: 'department',
+            type: 'input',
+            message: 'What is the name of the department you would like to add?'
+        }
+    ])
+    .then((answer) => {
+        if(!answer.department) {
+            console.log('Invalid input, please try again and type in a valid name');
+            mainPrompt(choiceList);
+        } else {
+            connection.query('INSERT INTO department SET ?', {name: `${answer.department}`}, (err, res) => {
+                if (err) throw err;
+                console.log('Your department was successfully added');
+                mainPrompt(choiceList);
+            });
+        };
+    });
+};
+
+const mainPrompt = (list) => {
+    inquirer.prompt(list)
+    .then((answer) => {
+        handleChoice(answer.select);
+    })
 }
 
 const handleChoice = (answer) => {
@@ -69,10 +91,7 @@ const handleChoice = (answer) => {
 
 const startPrompt = () => {
     console.log('Welcome to the Employee Tracker!');
-    inquirer.prompt(choiceList)
-    .then((answer) => {
-        handleChoice(answer.select);
-    });
+    mainPrompt(choiceList);
 };
 
 startPrompt();
