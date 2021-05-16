@@ -13,6 +13,8 @@ const connection = mysql.createConnection({
     database: 'employee_trackerDB'
 });
 
+const departments = ['Sales', 'Legal', 'Finance', 'Engineering'];
+
 const choiceList = [
     {
         name: "select",
@@ -21,6 +23,25 @@ const choiceList = [
         choices: ['View Departments', 'View Roles', 'View Employees', 'Add Department', 'Add Role', 'Add Employee', 'Update Employee Role', 'Exit']
     }
 ];
+
+const addRolePrompts = [
+    {
+        name: "title",
+        type: "input",
+        message: "What is the title of the role you would like to add?"
+    },
+    {
+        name: "salary",
+        type: "input",
+        message: "What is the salary of the role you are adding?"
+    },
+    {
+        name: "department",
+        type: 'list',
+        message: 'To which department would you like to assign your new role?',
+        choices: [...departments]
+    }
+]
 
 const viewTable = (table) => {
     connection.query(`SELECT * FROM ${table}`, (err, res) => {
@@ -47,6 +68,25 @@ const addDepartment = () => {
                 if (err) throw err;
                 console.log('Your department was successfully added');
                 mainPrompt(choiceList);
+            });
+        };
+    });
+};
+
+const addRole = () => {
+    inquirer.prompt(addRolePrompts)
+    .then((answer) => {
+        if(!answer.title || !answer.salary) {
+            console.log('Invalid input, please try again and type in a valid title and/or salary');
+            mainPrompt(choiceList);
+        } else {
+            connection.query(`SELECT id FROM employee_trackerdb.department WHERE name='${answer.department}'`, (err, res) => {
+                if (err) throw err;
+                connection.query('INSERT INTO role SET ?', {title: `${answer.title}`, salary: `${answer.salary}`, department_id: `${res[0].id}`}, (err, res) => {
+                    if (err) throw err;
+                    console.log('Your role was successfully added');
+                    mainPrompt(choiceList);
+                });
             });
         };
     });
