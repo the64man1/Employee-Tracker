@@ -22,16 +22,17 @@ const choiceList = [
         name: "select",
         type: 'list',
         message: 'What would you like to do?',
-        choices: ['View Departments', 'View Roles', 'View Employees', 'Add Department', 'Add Role', 'Add Employee', 'Update Employee Role', 'Exit']
+        choices: ['View Departments', 'View Roles', 'View Employees', 'Add Department', 'Add Role', 'Add Employee', 'Update Employee Role', 'Update Employee Manager', 'Exit']
     }
 ];
 
 const populateDepartments = () => {
     connection.query(`SELECT name FROM employee_trackerdb.department`, (err, res) => {
         if (err) throw err;
-        for (let i = 0; i < res.length; i++) {
-            departments.push(res[i].name);
-        }
+        res.forEach((raw) => {
+            const department = raw.name;
+            departments.push(department);
+        })
     })
 }
 
@@ -245,6 +246,44 @@ async function updateEmployeeRole () {
     })
 }
 
+async function updateEmployeeManager () {
+    let answer = await inquirer.prompt([
+        {
+            name: 'employee',
+            type: 'list',
+            message: 'For which employee would you like to update the manager?',
+            choices: [...employees]
+        },
+        {
+            name: 'manager',
+            type: 'list',
+            message: 'Who would you like to assign as his/her manager?',
+            choices: [...employees]
+        }
+    ])
+    if (answer.employee === answer.manager) {
+        console.log('You cannot make an employee his/her own manager');
+        mainPrompt(choiceList);
+    } else {
+        const employeeFullName = answer.employee.split(' ');
+        const employeeFirstName = employeeFullName[0];
+        const employeeLastName = employeeFullName[1];
+
+        const managerFullName = answer.manager.split(' ');
+        const managerFirstName = managerFullName[0];
+        const managerLastName = managerFullName[1];
+        connection.query(`SELECT id FROM employee_trackerdb.employee WHERE first_name='${managerFirstName}' AND last_name='${managerLastName}'`, (err, res) => {
+            if (err) throw err;
+            const Id = res[0].id;
+            connection.query(`UPDATE employee_trackerdb.employee SET manager_id='${Id}' WHERE first_name='${employeeFirstName}' AND last_name='${employeeLastName}'`, (err, res) => {
+                if (err) throw err;
+                console.log(`${answer.employee}'s manager has been updated to ${answer.manager}`);
+                mainPrompt(choiceList);
+            })
+        })
+    }
+}
+
 const mainPrompt = (list) => {
     inquirer.prompt(list)
     .then((answer) => {
@@ -274,6 +313,9 @@ const handleChoice = (answer) => {
             break;
         case 'Update Employee Role':
             updateEmployeeRole();
+            break;
+        case 'Update Employee Manager':
+            updateEmployeeManager();
             break;
         case 'Exit':
             console.log("Thanks for using the Employee Tracker! Goodbye!");
