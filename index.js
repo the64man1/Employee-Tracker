@@ -14,6 +14,8 @@ const connection = mysql.createConnection({
 });
 
 const departments = ['Sales', 'Legal', 'Finance', 'Engineering'];
+const roles = ['Business Developer', 'Lawyer', 'Accountant', 'Software Developer'];
+const employees = ['Jack Johnson', 'Sally Smith', 'Bobby Lee', 'Cynthia Burns', 'Tommy Stallings']
 
 const choiceList = [
     {
@@ -26,20 +28,45 @@ const choiceList = [
 
 const addRolePrompts = [
     {
-        name: "title",
-        type: "input",
-        message: "What is the title of the role you would like to add?"
+        name: 'title',
+        type: 'input',
+        message: 'What is the title of the role you would like to add?'
     },
     {
-        name: "salary",
-        type: "input",
-        message: "What is the salary of the role you are adding?"
+        name: 'salary',
+        type: 'input',
+        message: 'What is the salary of the role you are adding?'
     },
     {
-        name: "department",
+        name: 'department',
         type: 'list',
         message: 'To which department would you like to assign your new role?',
         choices: [...departments]
+    }
+]
+
+const addEmployeePrompts = [
+    {
+        name: 'firstname',
+        type: 'input',
+        message: 'What is the first name of the employee you would like to add?'
+    },
+    {
+        name: 'lastname',
+        type: 'input',
+        message: 'What is the last name of the employee you would like to add?'
+    },
+    {
+        name: 'role',
+        type: 'list',
+        message: 'What is the role of the employee you are adding?',
+        choices: [...roles]
+    },
+    {
+        name: 'manager',
+        type: 'list',
+        message: 'Who is this employees manager?',
+        choices: [...employees, 'Employee does not have a manager']
     }
 ]
 
@@ -82,10 +109,38 @@ const addRole = () => {
         } else {
             connection.query(`SELECT id FROM employee_trackerdb.department WHERE name='${answer.department}'`, (err, res) => {
                 if (err) throw err;
-                connection.query('INSERT INTO role SET ?', {title: `${answer.title}`, salary: `${answer.salary}`, department_id: `${res[0].id}`}, (err, res) => {
+                const departmentId = res[0].id;
+                connection.query('INSERT INTO role SET ?', { title: `${answer.title}`, salary: `${answer.salary}`, department_id: `${departmentId}` }, (err, res) => {
                     if (err) throw err;
                     console.log('Your role was successfully added');
                     mainPrompt(choiceList);
+                });
+            });
+        };
+    });
+};
+
+const addEmployee = () => {
+    inquirer.prompt(addEmployeePrompts)
+    .then((answer) => {
+        if(!answer.firstname || !answer.lastname) {
+            console.log('Invalid input, please try again and type in a valid first and/or last name');
+            mainPrompt(choiceList);
+        } else {
+            const managerFullName = answer.manager.split(' ');
+            const managerFirstName = managerFullName[0];
+            const managerLastName = managerFullName[1];
+            connection.query(`SELECT id FROM employee_trackerdb.role WHERE title='${answer.role}'`, (err, res) => {
+                if (err) throw err;
+                const roleId = res[0].id;
+                connection.query(`SELECT id FROM employee_trackerdb.employee WHERE first_name='${managerFirstName}' AND last_name='${managerLastName}'`, (err, res) => {
+                    if (err) throw err;
+                    const managerId = res[0].id;
+                    connection.query(`INSERT INTO employee SET ?`, { first_name: `${answer.firstname}`, last_name: `${answer.lastname}`, role_id: `${roleId}`, manager_id: `${managerId}` }, (err, res) => {
+                        if (err) throw err;
+                        console.log('The employee was succesfully added');
+                        mainPrompt(choiceList);
+                    });
                 });
             });
         };
