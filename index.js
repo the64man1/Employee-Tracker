@@ -78,9 +78,26 @@ const viewRoles = () => {
     })
 }
 
-// const viewEmployees = () => {
-
-// }
+const viewEmployees = () => {
+    connection.query(`
+    SELECT
+        employee.id,
+        employee.first_name,
+        employee.last_name,
+        role.title,
+        role.salary,
+        department.name AS 'department'
+    FROM employee
+    JOIN role
+        ON employee.role_id = role.id
+    JOIN department
+        ON department.id = role.department_id`,
+    (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        mainPrompt(choiceList);
+    })
+}
 
 async function addDepartment () {
     const answer = await inquirer.prompt([
@@ -244,7 +261,7 @@ const handleChoice = (answer) => {
             viewRoles();
             break;
         case 'View Employees':
-            viewTable('employee');
+            viewEmployees();
             break;
         case 'Add Department':
             addDepartment();
