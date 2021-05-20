@@ -22,7 +22,7 @@ const choiceList = [
         name: "select",
         type: 'list',
         message: 'What would you like to do?',
-        choices: ['View Departments', 'View Roles', 'View Employees', 'Add Department', 'Add Role', 'Add Employee', 'Update Employee Role', 'Update Employee Manager', 'Exit']
+        choices: ['View Departments', 'View Roles', 'View Employees', 'Add Department', 'Add Role', 'Add Employee', 'Update Employee Role', 'Update Employee Manager', 'View Employees By Manager', 'Exit']
     }
 ];
 
@@ -87,6 +87,7 @@ const viewEmployees = () => {
         employee.last_name,
         role.title,
         role.salary,
+        employee.manager_id,
         department.name AS 'department'
     FROM employee
     JOIN role
@@ -284,6 +285,21 @@ async function updateEmployeeManager () {
     }
 }
 
+const viewEmployeesByManager = () => {
+    connection.query(`
+    SELECT
+        CONCAT(e.first_name, " ", e.last_name) AS employee,
+        CONCAT(m.first_name, " ", m.last_name) AS manager
+    FROM employee_trackerdb.employee e
+    LEFT JOIN employee_trackerdb.employee m ON m.id = e.manager_id
+    ORDER BY manager;`,
+    (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        mainPrompt(choiceList);
+    })
+}
+
 const mainPrompt = (list) => {
     inquirer.prompt(list)
     .then((answer) => {
@@ -316,6 +332,9 @@ const handleChoice = (answer) => {
             break;
         case 'Update Employee Manager':
             updateEmployeeManager();
+            break;
+        case 'View Employees By Manager':
+            viewEmployeesByManager();
             break;
         case 'Exit':
             console.log("Thanks for using the Employee Tracker! Goodbye!");
