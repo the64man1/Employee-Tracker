@@ -4,7 +4,7 @@
 
 ## Description
     
-I endeavoure d to build a command line application that allow users to build and manage a database of employees for a business.
+I endeavoured to build a command line application that allow users to build and manage a database of employees for a business.
 
 
 This project allowed me to gain experience with database management and taking user input to manipulate a database.
