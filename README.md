@@ -23,7 +23,6 @@ In completing this project, I learned a great deal about SQL, building and manip
 - [Usage](#usage)
 - [License](#license)
 - [Contributing](#contributing)
-- [Tests](#tests)
 - [Questions](#questions)
     
 ## Installation
@@ -41,10 +40,6 @@ This project is distrubuted under the MIT License. See more information through 
 ## Contributing
     
 If you would like to contribute to this project by adding sections or modifying functionality, you can fork the project, creature your own feature branch (git checkout -b “feature/NewFeature”), commit your changes (git commit -m “I added NewFeature”), push the branch (git push origin feature/NewFeature), and open a pull request.
-    
-## Tests
-    
-
     
 ## Questions
     
