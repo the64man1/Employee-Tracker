@@ -32,6 +32,8 @@ To use the employee tracker, clone the repository by running "git clone `git@git
 ## Usage
     
 Users are free to use this project for managing employee databases and expanding its functionality.
+
+Video Tutorial: https://youtu.be/05w6EtnzdvE
     
 ## License
     
