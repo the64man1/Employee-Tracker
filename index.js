@@ -207,12 +207,20 @@ async function addEmployee () {
             const roleId = res[0].id;
             connection.query(`SELECT id FROM employee_trackerdb.employee WHERE first_name='${managerFirstName}' AND last_name='${managerLastName}'`, (err, res) => {
                 if (err) throw err;
-                const managerId = res[0].id;
-                connection.query(`INSERT INTO employee SET ?`, { first_name: `${answer.firstname}`, last_name: `${answer.lastname}`, role_id: `${roleId}`, manager_id: `${managerId}` }, (err, res) => {
-                    if (err) throw err;
-                    console.log(`${employee} was succesfully added`);
-                    mainPrompt(choiceList);
-                });
+                if (answer.manager == 'Employee does not have a manager') {
+                    connection.query(`INSERT INTO employee SET ?`, { first_name: `${answer.firstname}`, last_name: `${answer.lastname}`, role_id: `${roleId}` }, (err, res) => {
+                        if (err) throw err;
+                        console.log(`${employee} was succesfully added`);
+                        mainPrompt(choiceList);
+                    });
+                } else {
+                    const managerId = res[0].id;
+                    connection.query(`INSERT INTO employee SET ?`, { first_name: `${answer.firstname}`, last_name: `${answer.lastname}`, role_id: `${roleId}`, manager_id: `${managerId}` }, (err, res) => {
+                        if (err) throw err;
+                        console.log(`${employee} was succesfully added`);
+                        mainPrompt(choiceList);
+                    });
+                }
             });
         });
     };
