@@ -9,7 +9,9 @@ const connection = mysql.createConnection({
 
     user: 'root',
 
-    password: 'idplMAl7*',
+    // ENTER YOUR OWN SQL PASSWORD HERE!!!
+    password: '',
+    // MAKE SURE TO CREATE THIS DATABASE IN SQL PRIOR TO RUNNING THE APPLICATION, USE THE SCHEMA DESCRIBED IN THE 'SCHEMA.SQL' FILE
     database: 'employee_trackerDB'
 });
 
