@@ -27,7 +27,7 @@ In completing this project, I learned a great deal about SQL, building and manip
     
 ## Installation
     
-To use the employee tracker, clone the repository by running "git clone `git@github.com:the64man1/Employee-Tracker.git`' on your console. Then use the command 'npm install' to install the dependencies. Next you will need to create the 'employee_trackerdb' in MySQL by running a query in MySQL Workbench using the schema described in the 'schema.sql' file. Then you can run the command 'npm start' to begin using the Employee Tracker. Sample data is included in the seed.sql files.
+To use the employee tracker, clone the repository by running "git clone `git@github.com:the64man1/Employee-Tracker.git`' on your console. Then use the command 'npm install' to install the dependencies. Next you will need to add your own SQL password in the connection function in the index.js file, then create the 'employee_trackerdb' in MySQL by running a query in MySQL Workbench using the schema described in the 'schema.sql' file. Then you can run the command 'npm start' to begin using the Employee Tracker. Sample data is included in the seed.sql files.
     
 ## Usage
     
