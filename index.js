@@ -13,9 +13,9 @@ const connection = mysql.createConnection({
     database: 'employee_trackerDB'
 });
 
-const departments = [];
-const roles = [];
-const employees = [];
+let departments = [];
+let roles = [];
+let employees = [];
 
 const choiceList = [
     {
@@ -247,6 +247,32 @@ async function updateEmployeeRole () {
     })
 }
 
+// async function deleteDepartment () {
+//     let answer = await inquirer.prompt([
+//         {
+//             name: 'department',
+//             type: 'list',
+//             message: 'Which department would you like to delete? WARNING! Roles assigned to this department will now have "null" assigned as their department_id value!',
+//             choices: [...departments]
+//         }
+//     ])
+
+//     connection.query(`SELECT id FROM department WHERE name='${answer.department}'`, (err, res) => {
+//         if (err) throw err;
+//         const depId = res[0].id;
+//         connection.query(`UPDATE role SET department_id = '0' WHERE department_id='${depId}'`, (err, res) => {
+//             if (err) throw err;
+//             connection.query(`DELETE FROM department WHERE id='${depId}'`, (err, res) => {
+//                 if (err) throw err;
+//                 console.log(`${answer.department} has been deleted, and roles assigned to this department now have 'null' in their department_id column`);
+        
+//                 departments = departments.filter(item => item !== answer.department)
+//                 mainPrompt(choiceList);
+//             })
+//         })
+//     })
+// }
+
 async function updateEmployeeManager () {
     let answer = await inquirer.prompt([
         {
@@ -259,12 +285,22 @@ async function updateEmployeeManager () {
             name: 'manager',
             type: 'list',
             message: 'Who would you like to assign as his/her manager?',
-            choices: [...employees]
+            choices: [...employees, 'Employee now has no manager']
         }
     ])
     if (answer.employee === answer.manager) {
         console.log('You cannot make an employee his/her own manager');
         mainPrompt(choiceList);
+    } else if (answer.manager === 'Employee now has no manager') {
+        const employeeFullName = answer.employee.split(' ');
+        const employeeFirstName = employeeFullName[0];
+        const employeeLastName = employeeFullName[1];
+
+        connection.query(`UPDATE employee_trackerdb.employee SET manager_id=null WHERE first_name='${employeeFirstName}' AND last_name='${employeeLastName}'`, (err, res) => {
+                if (err) throw err;
+                console.log(`${answer.employee} now has no manager`);
+                mainPrompt(choiceList);
+            })
     } else {
         const employeeFullName = answer.employee.split(' ');
         const employeeFirstName = employeeFullName[0];
@@ -336,6 +372,9 @@ const handleChoice = (answer) => {
         case 'View Employees By Manager':
             viewEmployeesByManager();
             break;
+        // case 'Delete Department':
+        //     deleteDepartment();
+        //     break;
         case 'Exit':
             console.log("Thanks for using the Employee Tracker! Goodbye!");
             connection.end();
